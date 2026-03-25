@@ -1,15 +1,23 @@
-package com.example.mixin;
+package net.fabricmc.example;
 
-import net.minecraft.server.MinecraftServer;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.client.util.InputUtil;
+import org.lwjgl.glfw.GLFW;
 
-@Mixin(MinecraftServer.class)
-public class ExampleMixin {
-	@Inject(at = @At("HEAD"), method = "loadLevel")
-	private void init(CallbackInfo info) {
-		// This code is injected into the start of MinecraftServer.loadLevel()V
-	}
+public class ExampleMod implements ModInitializer {
+    @Override
+    public void onInitialize() {
+        // Modul sistemini baslat
+        ModuleManager.init();
+
+        // Tus kontrolu
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.player != null && client.currentScreen == null) {
+                if (InputUtil.isKeyPressed(client.getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT)) {
+                    client.setScreen(new ClickGuiScreen());
+                }
+            }
+        });
+    }
 }
